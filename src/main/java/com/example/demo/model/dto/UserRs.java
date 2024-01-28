@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRegistrationRq {
-    private String name;
-    private Integer age;
+public class UserRs {
+    private Long id;
+    private String email;
 }
