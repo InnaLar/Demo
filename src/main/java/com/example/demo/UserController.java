@@ -1,9 +1,11 @@
 package com.example.demo;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +40,27 @@ public class UserController {
             .build();
         USER_RS_LIST.add(userRs);
         return userRs;
+    }
+
+    @DeleteMapping("api/v1/users/{id}")
+    public List<UserRs> deleteUser(@PathVariable Long id) {
+        UserRs userRsFound = USER_RS_LIST.stream()
+            .filter(userRs -> userRs.getId().equals(id))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Cant find user"));
+        USER_RS_LIST.remove(userRsFound);
+        return USER_RS_LIST;
+    }
+
+    @PutMapping("api/v1/users")
+    public UserRs putUser(@RequestBody UserRs userRsToPut) {
+        UserRs userRsFound = USER_RS_LIST.stream()
+            .filter(userRs -> userRs.getId().equals(userRsToPut.getId()))
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Cant find user"));
+        userRsFound.setName(userRsToPut.getName());
+        userRsFound.setAge(userRsToPut.getAge());
+        return userRsFound;
     }
 
     @PostConstruct
