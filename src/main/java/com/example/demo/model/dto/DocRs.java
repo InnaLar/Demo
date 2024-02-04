@@ -5,16 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserRs {
+public class DocRs {
     private Long id;
-    private String email;
-    @Builder.Default
-    private List<DocShortRs> listDoc = new ArrayList<>();
+    private String title;
+    private Long userId;
 }

@@ -9,7 +9,7 @@ public class RunnerService {
 
     private final IPrinterService iPrinterService;
 
-    public RunnerService(@Qualifier("printerServiceImpl") final IPrinterService iPrinterService) {
+    public RunnerService(@Qualifier("customAnotherPrinterServiceImpl") final IPrinterService iPrinterService) {
         this.iPrinterService = iPrinterService;
     }
 

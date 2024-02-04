@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.dto.UserRegistrationRq;
 import com.example.demo.model.dto.UserRs;
+import com.example.demo.model.dto.UserShortRs;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,23 +17,16 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
 
-    private UserRs toUserRs(final User user) {
-        return UserRs.builder()
-            .id(user.getId())
-            .email(user.getEmail())
-            .build();
-    }
-
     public List<UserRs> findAll() {
         return userRepository.findAll()
             .stream()
-            .map(this::toUserRs)
+            .map(UserMapper::toUserRs)
             .toList();
     }
 
-    public UserRs getUserById(final Long id) {
+   public UserRs getUserById(final Long id) {
         return userRepository.findById(id)
-            .map(this::toUserRs)
+            .map(UserMapper::toUserRs)
             .orElseThrow(() -> new IllegalStateException("Can't find user by id: " + id));
     }
 
@@ -41,7 +36,7 @@ public class UserService {
             .password(userRegistrationRq.getPassword())
             .build();
         userRepository.save(user);
-        return toUserRs(user);
+        return UserMapper.toUserRs(user);
     }
 
     public void deleteUser(final Long id) {
@@ -49,13 +44,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserRs putUser(final UserRs request) {
+    public UserRs putUser(final UserShortRs request) {
         User user = userRepository.findById(request.getId())
             .orElseThrow(() -> new IllegalStateException("Can't find user by id: " + request.getId()));
 
         user.setEmail(request.getEmail());
 
-        return toUserRs(user);
+        return UserMapper.toUserRs(user);
     }
 
 }

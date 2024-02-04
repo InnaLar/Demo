@@ -13,6 +13,8 @@ public class Application {
 
         RunnerService runnerService = applicationContext.getBean("runnerService", RunnerService.class);
         runnerService.run();
+
+
     }
 
 }
