@@ -1,9 +1,11 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.ErrorCode;
+import com.example.demo.exception.ServiceException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.dto.UserRegistrationRq;
 import com.example.demo.model.dto.UserRs;
-import com.example.demo.model.dto.UserShortRs;
+import com.example.demo.model.dto.UserShortRq;
 import com.example.demo.model.entity.User;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +18,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public List<UserRs> findAll() {
         return userRepository.findAll()
             .stream()
-            .map(UserMapper::toUserRs)
+            .map(userMapper::toUserRs)
             .toList();
     }
 
-   public UserRs getUserById(final Long id) {
+    public UserRs getUserById(final Long id) {
+        if (id == 2) {
+            //http status 400
+            throw new ServiceException(ErrorCode.ERR_CODE_002, id);
+        }
         return userRepository.findById(id)
-            .map(UserMapper::toUserRs)
-            .orElseThrow(() -> new IllegalStateException("Can't find user by id: " + id));
+            .map(userMapper::toUserRs)
+            //http status 404
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, id));
     }
 
     public UserRs postUser(final UserRegistrationRq userRegistrationRq) {
@@ -36,7 +44,7 @@ public class UserService {
             .password(userRegistrationRq.getPassword())
             .build();
         userRepository.save(user);
-        return UserMapper.toUserRs(user);
+        return userMapper.toUserRs(user);
     }
 
     public void deleteUser(final Long id) {
@@ -44,13 +52,13 @@ public class UserService {
     }
 
     @Transactional
-    public UserRs putUser(final UserShortRs request) {
+    public UserRs putUser(final UserShortRq request) {
         User user = userRepository.findById(request.getId())
             .orElseThrow(() -> new IllegalStateException("Can't find user by id: " + request.getId()));
 
         user.setEmail(request.getEmail());
 
-        return UserMapper.toUserRs(user);
+        return userMapper.toUserRs(user);
     }
 
 }

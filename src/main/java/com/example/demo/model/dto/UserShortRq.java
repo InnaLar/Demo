@@ -11,6 +11,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocShortRs {
-    private String title;
+public class UserShortRq {
+    private Long id;
+    private String email;
 }

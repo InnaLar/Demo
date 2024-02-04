@@ -2,7 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.dto.UserRegistrationRq;
 import com.example.demo.model.dto.UserRs;
-import com.example.demo.model.dto.UserShortRs;
+import com.example.demo.model.dto.UserShortRq;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping
-    public UserRs putUser(@RequestBody final UserShortRs userRsToPut) {
+    public UserRs putUser(@RequestBody final UserShortRq userRsToPut) {
         return userService.putUser(userRsToPut);
     }
 

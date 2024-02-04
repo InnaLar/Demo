@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -15,6 +14,5 @@ import java.util.List;
 public class UserRs {
     private Long id;
     private String email;
-    @Builder.Default
-    private List<DocShortRs> listDoc = new ArrayList<>();
+    private List<DocRs> docRs;
 }

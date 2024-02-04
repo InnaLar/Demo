@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DocRegistrationRs {
+public class DocRegistrationRq {
     private Long userId;
     private String title;
 }

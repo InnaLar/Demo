@@ -1,6 +1,6 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.dto.DocRegistrationRs;
+import com.example.demo.model.dto.DocRegistrationRq;
 import com.example.demo.model.dto.DocRs;
 import com.example.demo.service.DocService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,7 @@ public class DocController {
 
     @GetMapping
     public List<DocRs> getDocList() {
-        List<DocRs> rs = docService.findAll();
-        return rs;
+        return docService.findAll();
     }
 
     @GetMapping("{id}")
@@ -33,8 +32,8 @@ public class DocController {
     }
 
     @PostMapping
-    public DocRs postDoc(@RequestBody final DocRegistrationRs docRegistrationRs) {
-        return docService.postDoc(docRegistrationRs);
+    public DocRs postDoc(@RequestBody final DocRegistrationRq docRegistrationRq) {
+        return docService.postDoc(docRegistrationRq);
     }
 
     @DeleteMapping("{id}")
