@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.dto.UserDocRegistrationRq;
 import com.example.demo.model.dto.UserRegistrationRq;
 import com.example.demo.model.dto.UserRs;
 import com.example.demo.model.dto.UserShortRq;
@@ -33,9 +34,14 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping
+    @PostMapping(value = "post1")
     public UserRs postUser(@RequestBody final UserRegistrationRq userRegistrationRq) {
         return userService.postUser(userRegistrationRq);
+    }
+
+    @PostMapping(value = "post2")
+    public UserRs postUserListDoc(@RequestBody final UserDocRegistrationRq userDocRegistrationRq) {
+        return userService.postUserListDoc(userDocRegistrationRq);
     }
 
     @DeleteMapping("{id}")

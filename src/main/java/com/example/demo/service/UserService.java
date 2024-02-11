@@ -3,10 +3,14 @@ package com.example.demo.service;
 import com.example.demo.exception.ErrorCode;
 import com.example.demo.exception.ServiceException;
 import com.example.demo.mapper.UserMapper;
+import com.example.demo.model.dto.DocRegistrationRq;
+import com.example.demo.model.dto.UserDocRegistrationRq;
 import com.example.demo.model.dto.UserRegistrationRq;
 import com.example.demo.model.dto.UserRs;
 import com.example.demo.model.dto.UserShortRq;
+import com.example.demo.model.entity.Doc;
 import com.example.demo.model.entity.User;
+import com.example.demo.repository.DocRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final DocRepository docRepository;
     private final UserMapper userMapper;
 
     public List<UserRs> findAll() {
@@ -47,6 +52,31 @@ public class UserService {
         return userMapper.toUserRs(user);
     }
 
+    public UserRs postUserListDoc(final UserDocRegistrationRq userDocRegistrationRq) {
+        User user = User.builder()
+            .email(userDocRegistrationRq.getEmail())
+            .password(userDocRegistrationRq.getPassword())
+            .build();
+        userRepository.save(user);
+        for (DocRegistrationRq docRegistrationRq : userDocRegistrationRq.getDocList()) {
+            Doc doc = Doc.builder()
+                .title(docRegistrationRq.getTitle())
+                .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
+                .build();
+            docRepository.save(doc);
+        }
+        /*userDocRegistrationRq.getDocList().stream()
+            .map(docRegistrationRq -> {Doc doc = Doc.builder()
+                .title(docRegistrationRq.getTitle())
+                .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
+                .build();
+                docRepository.save(doc);
+                return null;
+            });*/
+
+        return userMapper.toUserRs(user);
+    }
+
     public void deleteUser(final Long id) {
         userRepository.deleteById(id);
     }
@@ -54,7 +84,7 @@ public class UserService {
     @Transactional
     public UserRs putUser(final UserShortRq request) {
         User user = userRepository.findById(request.getId())
-            .orElseThrow(() -> new IllegalStateException("Can't find user by id: " + request.getId()));
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, request.getId()));
 
         user.setEmail(request.getEmail());
 
