@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.ErrorCode;
+import com.example.demo.exception.ServiceException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.dto.DocRegistrationRq;
 import com.example.demo.model.dto.DocRs;
@@ -20,17 +22,6 @@ public class DocService {
     private final UserMapper userMapper;
     private final DocRepository docRepository;
     private final DocUpdateService docUpdateService;
-    //    private final DocService self;
-
-    //    public DocService(UserRepository userRepository,
-    //                      UserMapper userMapper,
-    //                      DocRepository docRepository,
-    //                      @Lazy DocService self) {
-    //        this.userRepository = userRepository;
-    //        this.userMapper = userMapper;
-    //        this.docRepository = docRepository;
-    //        this.self = self;
-    //    }
 
     public List<DocRs> findAll() {
         return docRepository.findAll()
@@ -42,12 +33,12 @@ public class DocService {
     public DocRs findDocById(Long id) {
         return docRepository.findById(id)
             .map(userMapper::toDocRs)
-            .orElseThrow(() -> new IllegalStateException("can't find docs by id: " + id));
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_003, id));
     }
 
     public DocRs postDoc(final DocRegistrationRq reguest) {
         User user = userRepository.findById(reguest.getUserId())
-            .orElseThrow(() -> new IllegalStateException("can't find docs by id: " + reguest.getUserId()));
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, reguest.getUserId()));
         Doc doc = Doc.builder()
             .user(user)
             .title(reguest.getTitle())
@@ -65,13 +56,5 @@ public class DocService {
         //validate request
         return docUpdateService.update(request);
     }
-
-    //    @Transactional
-    //    public DocRs update(DocRs request) {
-    //        Doc doc = docRepository.findById(request.getId())
-    //            .orElseThrow(() -> new IllegalStateException("Can't find doc by id: " + request.getId()));
-    //        doc.setTitle(request.getTitle());
-    //        return userMapper.toDocRs(doc);
-    //    }
 
 }

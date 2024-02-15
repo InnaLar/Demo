@@ -14,7 +14,6 @@ import com.example.demo.repository.DocRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final DocRepository docRepository;
     private final UserMapper userMapper;
+    private final UserUpdateService userUpdateService;
 
     public List<UserRs> findAll() {
         return userRepository.findAll()
@@ -65,15 +65,6 @@ public class UserService {
                 .build();
             docRepository.save(doc);
         }
-        /*userDocRegistrationRq.getDocList().stream()
-            .map(docRegistrationRq -> {Doc doc = Doc.builder()
-                .title(docRegistrationRq.getTitle())
-                .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
-                .build();
-                docRepository.save(doc);
-                return null;
-            });*/
-
         return userMapper.toUserRs(user);
     }
 
@@ -81,14 +72,8 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    @Transactional
     public UserRs putUser(final UserShortRq request) {
-        User user = userRepository.findById(request.getId())
-            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, request.getId()));
-
-        user.setEmail(request.getEmail());
-
-        return userMapper.toUserRs(user);
+        return userUpdateService.putUser(request);
     }
 
 }
