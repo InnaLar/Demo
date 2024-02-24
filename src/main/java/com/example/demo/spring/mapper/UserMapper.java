@@ -1,6 +1,8 @@
 package com.example.demo.spring.mapper;
 
+import com.example.demo.spring.model.dto.DocRegistrationRq;
 import com.example.demo.spring.model.dto.DocRs;
+import com.example.demo.spring.model.dto.UserDocRegistrationRq;
 import com.example.demo.spring.model.dto.UserRs;
 import com.example.demo.spring.model.entity.Doc;
 import com.example.demo.spring.model.entity.User;
@@ -16,6 +18,23 @@ public class UserMapper {
             .email(user.getEmail())
             .docRs(toDocRsList(user.getDocList()))
             .build();
+    }
+
+    public UserDocRegistrationRq toUserDocRegistrationRs(final User user) {
+        return UserDocRegistrationRq.builder()
+            .email(user.getEmail())
+            .docList(user.getDocList().stream()
+                .map(doc -> DocRegistrationRq.builder()
+                    .title(doc.getTitle())
+                    .userId(doc.getUser().getId())
+                    .build()).toList())
+            .build();
+        /*List<DocRegistrationRq> list = user.getDocList().stream()
+            .map(doc -> DocRegistrationRq.builder()
+                .title(doc.getTitle())
+                .userId(doc.getUser().getId())
+                .build()).toList();*/
+
     }
 
     public DocRs toDocRs(final Doc doc) {

@@ -49,6 +49,8 @@ public class DocService {
     }
 
     public void deleteDoc(final Long id) {
+        if(docRepository.findById(id).isEmpty())
+            throw new ServiceException(ErrorCode.ERR_CODE_003, id);
         docRepository.deleteById(id);
     }
 

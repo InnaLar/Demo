@@ -4,6 +4,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
+/*@NamedEntityGraph(name = "User.docList",
+    attributeNodes = @NamedAttributeNode("docList")
+)*/
 public class User extends BaseEntity {
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;

@@ -61,14 +61,19 @@ public class UserService {
         for (DocRegistrationRq docRegistrationRq : userDocRegistrationRq.getDocList()) {
             Doc doc = Doc.builder()
                 .title(docRegistrationRq.getTitle())
-                .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
+                //.user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
+                .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, user.getId())))
                 .build();
             docRepository.save(doc);
+            user.getDocList().add(doc);
         }
+        userRepository.save(user);
         return userMapper.toUserRs(user);
     }
 
     public void deleteUser(final Long id) {
+        if(userRepository.findById(id).isEmpty())
+            throw new ServiceException(ErrorCode.ERR_CODE_001, id);
         userRepository.deleteById(id);
     }
 
