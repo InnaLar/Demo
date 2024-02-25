@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @EntityGraph(attributePaths = {"docList"})
+    /*@EntityGraph(attributePaths = {"docList"})
     List<User> findAll();
     @EntityGraph(attributePaths = {"docList"})
-    Optional<User> findById(Long id);
+    Optional<User> findById(Long id);*/
 }

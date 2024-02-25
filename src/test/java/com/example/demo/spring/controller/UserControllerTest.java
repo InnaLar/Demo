@@ -3,7 +3,6 @@ package com.example.demo.spring.controller;
 import com.example.demo.initializer.PostgreSqlInitializer;
 import com.example.demo.spring.exception.ErrorCode;
 import com.example.demo.spring.exception.ServiceException;
-import com.example.demo.spring.mapper.UserMapper;
 import com.example.demo.spring.model.dto.DocRegistrationRq;
 import com.example.demo.spring.model.dto.DocRs;
 import com.example.demo.spring.model.dto.UserDocRegistrationRq;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private UserMapper userMapper;
+    private TransactionTemplate transactionTemplate;
 
     @Test
     void getUserList() {
@@ -103,16 +103,18 @@ class UserControllerTest {
                 .docRs(List.of())
                 .build());
 
-        Assertions.assertThat(userRepository.findAll())
-            .hasSize(1)
-            .first()
-            .usingRecursiveComparison()
-            .ignoringFields("id")
-            .isEqualTo(User.builder()
-                .email("example@mail.ru")
-                .password("321")
-                .build()
-            );
+        transactionTemplate.execute((ts) ->
+            Assertions.assertThat(userRepository.findAll())
+                .hasSize(1)
+                .first()
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(User.builder()
+                    .email("example@mail.ru")
+                    .password("321")
+                    .build()
+                ));
+
     }
 
     @Test
@@ -159,7 +161,6 @@ class UserControllerTest {
                     .user(userRepository.findById(2L).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 2L)))
                     .build()))
                 .build());
-
     }
 
     /*@Test
