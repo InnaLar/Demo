@@ -29,9 +29,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-/*@NamedEntityGraph(name = "User.docList",
-    attributeNodes = @NamedAttributeNode("docList")
-)*/
 public class User extends BaseEntity {
     @Column(name = "email", unique = true, nullable = false, length = 100)
     private String email;

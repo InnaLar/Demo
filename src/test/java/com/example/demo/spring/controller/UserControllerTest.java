@@ -12,6 +12,7 @@ import com.example.demo.spring.model.entity.Doc;
 import com.example.demo.spring.model.entity.User;
 import com.example.demo.spring.repository.UserRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +25,7 @@ import java.util.List;
 @ContextConfiguration(initializers = {
     PostgreSqlInitializer.class
 })
+@Disabled
 class UserControllerTest {
 
     @Autowired

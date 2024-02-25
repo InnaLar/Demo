@@ -37,20 +37,22 @@ public class DocService {
     }
 
     public DocRs postDoc(final DocRegistrationRq reguest) {
-        User user = userRepository.findById(reguest.getUserId())
+        final User user = userRepository.findById(reguest.getUserId())
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, reguest.getUserId()));
-        Doc doc = Doc.builder()
+        final Doc doc = Doc.builder()
             .user(user)
             .title(reguest.getTitle())
             .build();
-        user.withDoc(doc);
+
         docRepository.save(doc);
+
         return userMapper.toDocRs(doc);
     }
 
     public void deleteDoc(final Long id) {
-        if(docRepository.findById(id).isEmpty())
+        if (docRepository.findById(id).isEmpty()) {
             throw new ServiceException(ErrorCode.ERR_CODE_003, id);
+        }
         docRepository.deleteById(id);
     }
 
