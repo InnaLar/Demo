@@ -19,7 +19,7 @@ public class UserUpdateService {
 
     @Transactional
     public UserRs putUser(final UserShortRq request) {
-        User user = userRepository.findById(request.getId())
+        final User user = userRepository.findById(request.getId())
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, request.getId()));
 
         user.setEmail(request.getEmail());

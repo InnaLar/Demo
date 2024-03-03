@@ -1,8 +1,7 @@
 package com.example.demo.spring.support;
 
-import com.example.demo.initializer.PostgreSqlInitializer;
-import com.example.demo.spring.controller.DocController;
 import com.example.demo.spring.controller.UserController;
+import com.example.demo.spring.initializer.PostgreSqlInitializer;
 import com.example.demo.spring.repository.DocRepository;
 import com.example.demo.spring.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Set;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 @ContextConfiguration(initializers = PostgreSqlInitializer.class)
 public abstract class IntegrationTestBase {
     @Autowired
+    protected WebTestClient webTestClient;
+    @Autowired
     protected JdbcTemplate jdbcTemplate;
     @Autowired
     protected TransactionTemplate transactionTemplate;
-    @Autowired
-    protected DocController docController;
     @Autowired
     protected UserController userController;
     @Autowired

@@ -1,6 +1,5 @@
 package com.example.demo.spring.controller;
 
-import com.example.demo.spring.exception.ServiceException;
 import com.example.demo.spring.model.dto.DocRegistrationRq;
 import com.example.demo.spring.model.dto.DocRs;
 import com.example.demo.spring.model.entity.Doc;
@@ -8,19 +7,39 @@ import com.example.demo.spring.model.entity.User;
 import com.example.demo.spring.support.IntegrationTestBase;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DocControllerTest extends IntegrationTestBase {
 
     @Test
-    void getDocList() {
-        assertThat(docController.getDocList())
-            .isEmpty();
+    void getDocListShouldWork() {
+        //GIVEN
+        final User user = User.builder()
+            .email("ColobocLSR@mail.ru")
+            .password("222")
+            .build()
+            .withDoc(Doc.builder()
+                .title("document1")
+                .build());
+        userRepository.save(user);
+
+        webTestClient.get()
+            .uri("/api/v1/docs")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBodyList(DocRs.class)
+            .isEqualTo(List.of(DocRs.builder()
+                .id(1L)
+                .title("document1")
+                .userId(user.getId())
+                .build()
+            ));
     }
 
     @Test
-    void postDoc() {
+    void postDocShouldSuccess() {
         //GIVEN
         final User user = User.builder()
             .password("321")
@@ -34,18 +53,19 @@ class DocControllerTest extends IntegrationTestBase {
             .build();
 
         //WHEN
-        final DocRs docRs = docController.postDoc(docRegistrationRq);
-
-        //THEN
-        assertThat(docRs)
-            .usingRecursiveComparison()
-            .ignoringFields("id")
+        webTestClient.post()
+            .uri("/api/v1/docs")
+            .bodyValue(docRegistrationRq)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(DocRs.class)
             .isEqualTo(DocRs.builder()
-                .userId(user.getId())
+                .id(1L)
                 .title("document2")
+                .userId(user.getId())
                 .build());
 
-        transactionTemplate.execute((ts) -> assertThat(docRepository.findById(1L))
+        transactionTemplate.execute(ts -> assertThat(docRepository.findById(1L))
             .get()
             .usingRecursiveComparison()
             .ignoringFields("createDate", "updateDate", "user")
@@ -60,7 +80,7 @@ class DocControllerTest extends IntegrationTestBase {
     @Test
     void getDocById() {
         //GIVEN
-        User user = User.builder()
+        final User user = User.builder()
             .email("ColobocLSR@mail.ru")
             .password("222")
             .build()
@@ -69,16 +89,17 @@ class DocControllerTest extends IntegrationTestBase {
                 .build());
         userRepository.save(user);
 
-        //WHEN
-        DocRs docRs = docController.getDocById(1L);
-
-        //THEN
-        assertThat(docRs)
-            .usingRecursiveComparison()
-            .ignoringFields("userId")
+        webTestClient.get()
+            .uri(uriBuilder -> uriBuilder
+                .path("/api/v1/docs/{id}")
+                .build(1L))
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(DocRs.class)
             .isEqualTo(DocRs.builder()
                 .id(1L)
                 .title("document1")
+                .userId(user.getId())
                 .build());
     }
 
@@ -95,21 +116,22 @@ class DocControllerTest extends IntegrationTestBase {
 
         userRepository.save(user);
 
-        DocRs docRs = DocRs.builder()
+        final DocRs docRs = DocRs.builder()
             .id(1L)
             .title("doc1")
             .build();
 
         //WHEN
-        final DocRs request = docController.putDoc(docRs);
-
-        //THEN
-        assertThat(request)
-            .usingRecursiveComparison()
-            .ignoringFields("userId")
+        webTestClient.put()
+            .uri("/api/v1/docs")
+            .bodyValue(docRs)
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(DocRs.class)
             .isEqualTo(DocRs.builder()
                 .id(1L)
                 .title("doc1")
+                .userId(user.getId())
                 .build());
 
         assertThat(docRepository.findById(1L))
@@ -136,18 +158,25 @@ class DocControllerTest extends IntegrationTestBase {
         userRepository.save(user);
 
         //WHEN
-        docController.deleteDocById(1L);
+        webTestClient.delete()
+            .uri(uriBuilder -> uriBuilder
+                .path("/api/v1/docs/{id}")
+                .build(1L))
+            .exchange()
+            .expectStatus().isOk();
 
-        //THEN
         assertThat(docRepository.findAll())
             .isEmpty();
-
     }
 
     @Test
     void shouldThrowExceptionDeleteByWrongId() {
-        assertThatThrownBy(() -> docController.deleteDocById(5L))
-            .isInstanceOf(ServiceException.class)
-            .hasMessage("Doc with id %s not found", 5L);
+        webTestClient.delete()
+            .uri(uriBuilder -> uriBuilder
+                .pathSegment("api", "v1", "docs", "5")
+                .build())
+            .exchange()
+            .expectStatus()
+            .isEqualTo(404);
     }
 }

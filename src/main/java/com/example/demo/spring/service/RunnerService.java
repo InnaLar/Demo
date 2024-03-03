@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class RunnerService {
 
-    private final IPrinterService iPrinterService;
+    private final IprinterService iPrinterService;
 
-    public RunnerService(@Qualifier("customAnotherPrinterServiceImpl") final IPrinterService iPrinterService) {
+    public RunnerService(@Qualifier("customAnotherPrinterServiceImpl") final IprinterService iPrinterService) {
         this.iPrinterService = iPrinterService;
     }
 

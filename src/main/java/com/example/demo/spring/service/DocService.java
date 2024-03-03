@@ -30,7 +30,7 @@ public class DocService {
             .toList();
     }
 
-    public DocRs findDocById(Long id) {
+    public DocRs findDocById(final Long id) {
         return docRepository.findById(id)
             .map(userMapper::toDocRs)
             .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_003, id));
@@ -56,7 +56,7 @@ public class DocService {
         docRepository.deleteById(id);
     }
 
-    public DocRs putDoc(@RequestBody DocRs request) {
+    public DocRs putDoc(final @RequestBody DocRs request) {
         //validate request
         return docUpdateService.update(request);
     }

@@ -15,8 +15,8 @@ public class DocUpdateService {
     private final UserMapper userMapper;
 
     @Transactional
-    public DocRs update(DocRs request) {
-        Doc doc = docRepository.findById(request.getId())
+    public DocRs update(final DocRs request) {
+        final Doc doc = docRepository.findById(request.getId())
             .orElseThrow(() -> new IllegalStateException("Can't find doc by id: " + request.getId()));
         doc.setTitle(request.getTitle());
         return userMapper.toDocRs(doc);

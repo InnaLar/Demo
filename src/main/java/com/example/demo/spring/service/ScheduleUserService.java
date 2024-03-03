@@ -20,7 +20,6 @@ public class ScheduleUserService {
         this.self = self;
     }
 
-
     @Scheduled(fixedDelay = 3000)
     public void scheduleFixedDelayTask() {
         //scheduleUserUpdateService.updatePasswords();

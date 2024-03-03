@@ -44,7 +44,7 @@ public class UserService {
     }
 
     public UserRs postUser(final UserRegistrationRq userRegistrationRq) {
-        User user = User.builder()
+        final User user = User.builder()
             .email(userRegistrationRq.getEmail())
             .password(userRegistrationRq.getPassword())
             .build();
@@ -53,13 +53,13 @@ public class UserService {
     }
 
     public UserRs postUserListDoc(final UserDocRegistrationRq userDocRegistrationRq) {
-        User user = User.builder()
+        final User user = User.builder()
             .email(userDocRegistrationRq.getEmail())
             .password(userDocRegistrationRq.getPassword())
             .build();
         userRepository.save(user);
         for (DocRegistrationRq docRegistrationRq : userDocRegistrationRq.getDocList()) {
-            Doc doc = Doc.builder()
+            final Doc doc = Doc.builder()
                 .title(docRegistrationRq.getTitle())
                 //.user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, docRegistrationRq.getUserId())))
                 .user(userRepository.findById(user.getId()).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, user.getId())))
@@ -72,8 +72,9 @@ public class UserService {
     }
 
     public void deleteUser(final Long id) {
-        if(userRepository.findById(id).isEmpty())
+        if (userRepository.findById(id).isEmpty()) {
             throw new ServiceException(ErrorCode.ERR_CODE_001, id);
+        }
         userRepository.deleteById(id);
     }
 

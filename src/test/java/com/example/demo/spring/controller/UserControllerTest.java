@@ -16,30 +16,30 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class UserControllerTest extends IntegrationTestBase {
 
     @Test
     void getUserList() {
-        Assertions
-            .assertThat(userController.getUserList())
+        assertThat(userController.getUserList())
             .isEmpty();
     }
 
     @Test
     void getUserById() {
         //GIVEN
-        User user = User.builder()
+        final User user = User.builder()
             .email("InnaLarina021@jmail.ru")
             .password("123")
             .build()
             .withDoc(Doc.builder().title("document1").build());
         userRepository.save(user);
         //WHEN
-        UserRs userRs = transactionTemplate
-            .execute((ts) -> userController.getUserById(1L));
+        final UserRs userRs = transactionTemplate
+            .execute(ts -> userController.getUserById(1L));
         //THEN
-        Assertions
-            .assertThat(userRs)
+        assertThat(userRs)
             .usingRecursiveComparison()
             .ignoringFields("id", "docList.id", "docList.userId")
             .isEqualTo(UserRs.builder()
@@ -56,7 +56,7 @@ class UserControllerTest extends IntegrationTestBase {
     @Test
     void deleteUserById() {
         //GIVEN
-        User user = User.builder()
+        final User user = User.builder()
             .email("InnaLarina021@jmail.ru")
             .password("123")
             .build()
@@ -66,8 +66,7 @@ class UserControllerTest extends IntegrationTestBase {
         //WHEN
         userController.deleteUserById(1L);
         //THEN
-        Assertions
-            .assertThat(userRepository.findAll())
+        assertThat(userRepository.findAll())
             .isEmpty();
     }
 
@@ -81,16 +80,16 @@ class UserControllerTest extends IntegrationTestBase {
     @Test
     void postUser() {
         //GIVEN
-        UserRegistrationRq request = UserRegistrationRq.builder()
+        final UserRegistrationRq request = UserRegistrationRq.builder()
             .email("example@mail.ru")
             .password("321")
             .build();
 
         //WHEN
-        UserRs userRs = userController.postUser(request);
+        final UserRs userRs = userController.postUser(request);
 
         //THEN
-        Assertions.assertThat(userRs)
+        assertThat(userRs)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(UserRs.builder()
@@ -98,9 +97,9 @@ class UserControllerTest extends IntegrationTestBase {
                 .docRs(List.of())
                 .build());
 
-        transactionTemplate.execute((ts) ->
-            Assertions.assertThat(userRepository.findById(1L)
-                    .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+        transactionTemplate.execute(ts ->
+            assertThat(userRepository.findById(1L)
+                .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(User.builder()
@@ -114,7 +113,7 @@ class UserControllerTest extends IntegrationTestBase {
     @Test
     void postUserListDoc() {
         //Given
-        UserDocRegistrationRq request = UserDocRegistrationRq.builder()
+        final UserDocRegistrationRq request = UserDocRegistrationRq.builder()
             .email("InnaLar@mail.ru")
             .password("343")
             .docList(List.of(
@@ -125,10 +124,10 @@ class UserControllerTest extends IntegrationTestBase {
             )).build();
 
         //WHEN
-        UserRs userRs = userController.postUserListDoc(request);
+        final UserRs userRs = userController.postUserListDoc(request);
 
         //THEN
-        Assertions.assertThat(userRs)
+        assertThat(userRs)
             .usingRecursiveComparison()
             .ignoringFields("id")
             .isEqualTo(UserRs.builder()
@@ -140,8 +139,8 @@ class UserControllerTest extends IntegrationTestBase {
                     .build()))
                 .build());
         transactionTemplate.execute(
-            (ts) -> Assertions.assertThat(userRepository.findById(1L)
-                    .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+            ts -> assertThat(userRepository.findById(1L)
+                .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
                 .usingRecursiveComparison()
                 .ignoringFields("id", "docList.updateDate", "docList.createDate")
                 .isEqualTo(User.builder()
@@ -159,7 +158,7 @@ class UserControllerTest extends IntegrationTestBase {
     void putUser() {
 
         //GIVEN
-        User user = User.builder()
+        final User user = User.builder()
             .email("example@mail.ru")
             .password("321")
             .build();
@@ -167,29 +166,28 @@ class UserControllerTest extends IntegrationTestBase {
         userRepository.save(user);
 
         //WHEN
-        UserShortRq userRsToPut = UserShortRq.builder()
+        final UserShortRq userRsToPut = UserShortRq.builder()
             .email("colobocLSR@mail.ru")
             .id(1L)
             .build();
-        UserRs userRs = userController.putUser(userRsToPut);
+        final UserRs userRs = userController.putUser(userRsToPut);
 
         //THEN
-        Assertions.assertThat(userRs)
+        assertThat(userRs)
             .isEqualTo(UserRs.builder()
                 .docRs(List.of())
                 .id(1L)
                 .email("colobocLSR@mail.ru")
                 .build());
 
-        transactionTemplate.execute(
-            (ts) -> (Assertions.assertThat(userRepository.findById(1L)
-                .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
-                .usingRecursiveComparison()
-                .isEqualTo(User.builder()
-                    .id(1L)
-                    .email("colobocLSR@mail.ru")
-                    .password("321")
-                    .build())));
+        transactionTemplate.execute(ts -> assertThat(userRepository.findById(1L)
+            .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+            .usingRecursiveComparison()
+            .isEqualTo(User.builder()
+                .id(1L)
+                .email("colobocLSR@mail.ru")
+                .password("321")
+                .build()));
     }
 
 }

@@ -4,8 +4,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.NamedAttributeNode;
-import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -39,7 +37,7 @@ public class User extends BaseEntity {
     @ToString.Exclude
     private List<Doc> docList = new ArrayList<>();
 
-    public User withDoc (final Doc doc) {
+    public User withDoc(final Doc doc) {
         this.docList.add(doc);
         doc.setUser(this);
         return this;

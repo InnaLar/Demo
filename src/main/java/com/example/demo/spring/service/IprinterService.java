@@ -1,5 +1,5 @@
 package com.example.demo.spring.service;
 
-public interface IPrinterService {
+public interface IprinterService {
     void print();
 }
