@@ -2,6 +2,7 @@ package com.example.demo.spring.support;
 
 import com.example.demo.initializer.PostgreSqlInitializer;
 import com.example.demo.spring.controller.DocController;
+import com.example.demo.spring.controller.UserController;
 import com.example.demo.spring.repository.DocRepository;
 import com.example.demo.spring.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -23,6 +24,8 @@ public abstract class IntegrationTestBase {
     protected TransactionTemplate transactionTemplate;
     @Autowired
     protected DocController docController;
+    @Autowired
+    protected UserController userController;
     @Autowired
     protected UserRepository userRepository;
     @Autowired

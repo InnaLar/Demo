@@ -1,6 +1,5 @@
 package com.example.demo.spring.controller;
 
-import com.example.demo.initializer.PostgreSqlInitializer;
 import com.example.demo.spring.exception.ErrorCode;
 import com.example.demo.spring.exception.ServiceException;
 import com.example.demo.spring.model.dto.DocRegistrationRq;
@@ -8,78 +7,72 @@ import com.example.demo.spring.model.dto.DocRs;
 import com.example.demo.spring.model.dto.UserDocRegistrationRq;
 import com.example.demo.spring.model.dto.UserRegistrationRq;
 import com.example.demo.spring.model.dto.UserRs;
+import com.example.demo.spring.model.dto.UserShortRq;
 import com.example.demo.spring.model.entity.Doc;
 import com.example.demo.spring.model.entity.User;
-import com.example.demo.spring.repository.UserRepository;
+import com.example.demo.spring.support.IntegrationTestBase;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(initializers = {
-    PostgreSqlInitializer.class
-})
-@Disabled
-class UserControllerTest {
-
-    @Autowired
-    private UserController userController;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private TransactionTemplate transactionTemplate;
+class UserControllerTest extends IntegrationTestBase {
 
     @Test
     void getUserList() {
-        //GIVEN
-        int allUsers = 2;
-
-        //THEN
         Assertions
             .assertThat(userController.getUserList())
-            .hasSize(allUsers);
+            .isEmpty();
     }
 
     @Test
     void getUserById() {
         //GIVEN
-        long existingUserId = 1L;
+        User user = User.builder()
+            .email("InnaLarina021@jmail.ru")
+            .password("123")
+            .build()
+            .withDoc(Doc.builder().title("document1").build());
+        userRepository.save(user);
+        //WHEN
+        UserRs userRs = transactionTemplate
+            .execute((ts) -> userController.getUserById(1L));
         //THEN
         Assertions
-            .assertThat(userController.getUserById(existingUserId))
+            .assertThat(userRs)
             .usingRecursiveComparison()
-            .ignoringFields("id", "docList.createDate", "docList.updateDate")
+            .ignoringFields("id", "docList.id", "docList.userId")
             .isEqualTo(UserRs.builder()
-                .email("example@mail.ru")
-                .docRs(List.of())
+                .id(1L)
+                .email("InnaLarina021@jmail.ru")
+                .docRs(List.of(DocRs.builder()
+                    .id(1L)
+                    .title("document1")
+                    .userId(1L)
+                    .build()))
                 .build());
     }
 
     @Test
     void deleteUserById() {
         //GIVEN
-        long shouldBeDeleted = 1L;
+        User user = User.builder()
+            .email("InnaLarina021@jmail.ru")
+            .password("123")
+            .build()
+            .withDoc(Doc.builder().title("document1").build());
+        userRepository.save(user);
+
         //WHEN
-        userController.deleteUserById(shouldBeDeleted);
+        userController.deleteUserById(1L);
         //THEN
         Assertions
             .assertThat(userRepository.findAll())
-            .hasSize(1);
+            .isEmpty();
     }
 
     @Test
     void shouldThrowExceptionDeleteByWrongId() {
-        //GIVEN
-
-        //WHEN
-
-        //THEN
         Assertions.assertThatThrownBy(() -> userController.deleteUserById(5L))
             .isInstanceOf(ServiceException.class)
             .hasMessage("User with id %s not found", 5L);
@@ -106,9 +99,8 @@ class UserControllerTest {
                 .build());
 
         transactionTemplate.execute((ts) ->
-            Assertions.assertThat(userRepository.findAll())
-                .hasSize(1)
-                .first()
+            Assertions.assertThat(userRepository.findById(1L)
+                    .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(User.builder()
@@ -144,47 +136,42 @@ class UserControllerTest {
                 .docRs(List.of(DocRs.builder()
                     .id(1L)
                     .title("document1")
-                    .userId(2L)
+                    .userId(1L)
                     .build()))
                 .build());
-
-        Assertions.assertThat(userRepository.findAll())
-            .hasSize(2)
-            .filteredOn("id", 2L)
-            .first()
-            .usingRecursiveComparison()
-            .ignoringFields("id", "docList.updateDate", "docList.createDate")
-            .isEqualTo(User.builder()
-                .email("InnaLar@mail.ru")
-                .password("343")
-                .docList(List.of(Doc.builder()
-                    .id(1L)
-                    .title("document1")
-                    .user(userRepository.findById(2L).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 2L)))
-                    .build()))
-                .build());
+        transactionTemplate.execute(
+            (ts) -> Assertions.assertThat(userRepository.findById(1L)
+                    .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+                .usingRecursiveComparison()
+                .ignoringFields("id", "docList.updateDate", "docList.createDate")
+                .isEqualTo(User.builder()
+                    .email("InnaLar@mail.ru")
+                    .password("343")
+                    .docList(List.of(Doc.builder()
+                        .id(1L)
+                        .title("document1")
+                        .user(userRepository.findById(1L).orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+                        .build()))
+                    .build()));
     }
 
-    /*@Test
+    @Test
     void putUser() {
 
-
         //GIVEN
-        UserRegistrationRq request = UserRegistrationRq.builder()
+        User user = User.builder()
             .email("example@mail.ru")
             .password("321")
             .build();
 
-        List<UserRs> userRsList = userController.getUserList();
-        UserRs userRs = userController.postUser(request);
+        userRepository.save(user);
 
+        //WHEN
         UserShortRq userRsToPut = UserShortRq.builder()
             .email("colobocLSR@mail.ru")
             .id(1L)
             .build();
-
-        //WHEN
-        userRs = userController.putUser(userRsToPut);
+        UserRs userRs = userController.putUser(userRsToPut);
 
         //THEN
         Assertions.assertThat(userRs)
@@ -193,7 +180,16 @@ class UserControllerTest {
                 .id(1L)
                 .email("colobocLSR@mail.ru")
                 .build());
-        userController.deleteUserById(1L);
-    }*/
+
+        transactionTemplate.execute(
+            (ts) -> (Assertions.assertThat(userRepository.findById(1L)
+                .orElseThrow(() -> new ServiceException(ErrorCode.ERR_CODE_001, 1L)))
+                .usingRecursiveComparison()
+                .isEqualTo(User.builder()
+                    .id(1L)
+                    .email("colobocLSR@mail.ru")
+                    .password("321")
+                    .build())));
+    }
 
 }
