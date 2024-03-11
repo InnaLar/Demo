@@ -1,6 +1,6 @@
 package com.example.demo.spring.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.example.demo.spring.service.printer.IprinterService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -8,7 +8,7 @@ public class RunnerService {
 
     private final IprinterService iPrinterService;
 
-    public RunnerService(@Qualifier("customAnotherPrinterServiceImpl") final IprinterService iPrinterService) {
+    public RunnerService(final IprinterService iPrinterService) {
         this.iPrinterService = iPrinterService;
     }
 

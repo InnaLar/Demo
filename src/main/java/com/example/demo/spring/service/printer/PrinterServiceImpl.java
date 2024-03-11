@@ -1,8 +1,5 @@
-package com.example.demo.spring.service;
+package com.example.demo.spring.service.printer;
 
-import org.springframework.stereotype.Service;
-
-@Service
 public class PrinterServiceImpl implements IprinterService {
 
     @Override
