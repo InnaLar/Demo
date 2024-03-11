@@ -11,6 +11,7 @@ import com.example.demo.spring.model.dto.UserShortRq;
 import com.example.demo.spring.model.entity.Doc;
 import com.example.demo.spring.model.entity.User;
 import com.example.demo.spring.support.IntegrationTestBase;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -183,9 +184,15 @@ class UserControllerTest extends IntegrationTestBase {
             .bodyValue(request)
             .exchange();
 
-        response.expectStatus()
+        final UserRs responseBody = response.expectStatus()
             .isOk()
             .expectBody(UserRs.class)
+            .returnResult()
+            .getResponseBody();
+
+        Assertions.assertThat(responseBody)
+            .usingRecursiveComparison()
+            .ignoringFields("id")
             .isEqualTo(UserRs.builder()
                 .email("InnaLar@mail.ru")
                 .id(1L)
